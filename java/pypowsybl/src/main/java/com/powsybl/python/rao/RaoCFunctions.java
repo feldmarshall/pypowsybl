@@ -8,17 +8,20 @@
 package com.powsybl.python.rao;
 
 import com.powsybl.commons.PowsyblException;
+import com.powsybl.glsk.api.GlskDocument;
 import com.powsybl.glsk.api.io.GlskDocumentImporters;
-import com.powsybl.glsk.commons.ZonalData;
 import com.powsybl.iidm.network.Network;
+import com.powsybl.loadflow.LoadFlowParameters;
+import com.powsybl.loadflow.LoadFlowProvider;
 import com.powsybl.openrao.data.crac.api.Crac;
 import com.powsybl.openrao.data.raoresult.api.RaoResult;
 import com.powsybl.openrao.raoapi.json.JsonRaoParameters;
 import com.powsybl.openrao.raoapi.parameters.RaoParameters;
+import com.powsybl.python.commons.CTypeUtil;
 import com.powsybl.python.commons.Directives;
 import com.powsybl.python.commons.PyPowsyblApiHeader;
 import com.powsybl.python.commons.Util;
-import com.powsybl.sensitivity.SensitivityVariableSet;
+import com.powsybl.python.loadflow.LoadFlowCUtils;
 import org.graalvm.nativeimage.IsolateThread;
 import org.graalvm.nativeimage.ObjectHandle;
 import org.graalvm.nativeimage.ObjectHandles;
@@ -33,6 +36,7 @@ import java.util.Properties;
 
 import static com.powsybl.python.commons.Util.binaryBufferToBytes;
 import static com.powsybl.python.commons.Util.doCatch;
+import static com.powsybl.python.loadflow.LoadFlowCUtils.createLoadFlowParameters;
 
 /**
  * @author Bertrand Rix {@literal <bertrand.rix at artelys.com>}
@@ -101,8 +105,7 @@ public final class RaoCFunctions {
             ByteBuffer bufferGlsks = CTypeConversion.asByteBuffer(glsksBuffer, glsksBufferSize);
 
             InputStream glsksStream = new ByteArrayInputStream(binaryBufferToBytes(bufferGlsks));
-            ZonalData<SensitivityVariableSet> glsks = GlskDocumentImporters.importGlsk(glsksStream)
-                .getZonalGlsks(network);
+            GlskDocument glsks = GlskDocumentImporters.importGlsk(glsksStream);
             raoContext.setGlsks(glsks);
         });
     }
@@ -115,6 +118,34 @@ public final class RaoCFunctions {
             RaoContext raoContext = ObjectHandles.getGlobal().get(raoContextHandle);
             RaoParameters raoParameters = ObjectHandles.getGlobal().get(raoParametersHandle);
             raoContext.run(network, raoParameters);
+        });
+    }
+
+    @CEntryPoint(name = "runVoltageMonitoring")
+    public static void runVoltageMonitoring(IsolateThread thread, ObjectHandle networkHandle, ObjectHandle raoContextHandle,
+                                     PyPowsyblApiHeader.LoadFlowParametersPointer loadFlowParametersPtr,
+                                     CCharPointer provider, PyPowsyblApiHeader.ExceptionHandlerPointer exceptionHandlerPtr) {
+        doCatch(exceptionHandlerPtr, () -> {
+            Network network = ObjectHandles.getGlobal().get(networkHandle);
+            RaoContext raoContext = ObjectHandles.getGlobal().get(raoContextHandle);
+            String providerStr = CTypeUtil.toString(provider);
+            LoadFlowProvider loadFlowProvider = LoadFlowCUtils.getLoadFlowProvider(providerStr);
+            LoadFlowParameters lfParameters = createLoadFlowParameters(false, loadFlowParametersPtr, loadFlowProvider);
+            raoContext.runVoltageMonitoring(network, providerStr, lfParameters);
+        });
+    }
+
+    @CEntryPoint(name = "runAngleMonitoring")
+    public static void runAngleMonitoring(IsolateThread thread, ObjectHandle networkHandle, ObjectHandle raoContextHandle,
+                                     PyPowsyblApiHeader.LoadFlowParametersPointer loadFlowParametersPtr,
+                                     CCharPointer provider, PyPowsyblApiHeader.ExceptionHandlerPointer exceptionHandlerPtr) {
+        doCatch(exceptionHandlerPtr, () -> {
+            Network network = ObjectHandles.getGlobal().get(networkHandle);
+            RaoContext raoContext = ObjectHandles.getGlobal().get(raoContextHandle);
+            String providerStr = CTypeUtil.toString(provider);
+            LoadFlowProvider loadFlowProvider = LoadFlowCUtils.getLoadFlowProvider(providerStr);
+            LoadFlowParameters lfParameters = createLoadFlowParameters(false, loadFlowParametersPtr, loadFlowProvider);
+            raoContext.runAngleMonitoring(network, providerStr, lfParameters);
         });
     }
 
@@ -167,4 +198,29 @@ public final class RaoCFunctions {
             return ObjectHandles.getGlobal().create(raoContext.getResults());
         });
     }
+
+    /*@CEntryPoint(name = "getMonitoringResultStatus")
+    public static PyPowsyblApiHeader.RaoMonitoringStatus getMonitoringResultStatus(IsolateThread thread, ObjectHandle raoMonitoringHandle, PyPowsyblApiHeader.ExceptionHandlerPointer exceptionHandlerPtr) {
+        return doCatch(exceptionHandlerPtr, () -> {
+            MonitoringResult result = ObjectHandles.getGlobal().get(raoMonitoringHandle);
+            switch (result.getStatus()) {
+                case SECURE -> {
+                    return PyPowsyblApiHeader.RaoMonitoringStatus.SECURE;
+                }
+                case HIGH_CONSTRAINT -> {
+                    return PyPowsyblApiHeader.RaoMonitoringStatus.HIGH_CONSTRAINT;
+                }
+                case LOW_CONSTRAINT -> {
+                    return PyPowsyblApiHeader.RaoMonitoringStatus.LOW_CONSTRAINT;
+                }
+                case HIGH_AND_LOW_CONSTRAINTS -> {
+                    return PyPowsyblApiHeader.RaoMonitoringStatus.HIGH_AND_LOW_CONSTRAINTS;
+                }
+                case FAILURE -> {
+                    return PyPowsyblApiHeader.RaoMonitoringStatus.MONITORING_FAILURE;
+                }
+                default -> throw new PowsyblException("Unexpected monitoring status : " + result.getStatus());
+            }
+        });
+    }*/
 }

@@ -28,7 +28,6 @@ py::bytes saveNetworkToBinaryBufferPython(const pypowsybl::JavaHandle& network, 
 
 void setCracSource(const pypowsybl::JavaHandle& networkHandle, const pypowsybl::JavaHandle& raoHandle, const py::buffer& crac);
 void setGlskSource(const pypowsybl::JavaHandle& networkHandle, const pypowsybl::JavaHandle& raoHandle, const py::buffer& glsk);
-void runRaoWithParameters(const pypowsybl::JavaHandle& networkHandle, const pypowsybl::JavaHandle& raoHandle, const pypowsybl::JavaHandle& parametersHandle);
 pypowsybl::JavaHandle loadRaoParametersFromBuffer(const py::buffer& parameters);
 
 py::bytes saveRaoParametersToBinaryBuffer(const pypowsybl::JavaHandle& rao_parameters);
@@ -1145,7 +1144,7 @@ PYBIND11_MODULE(_pypowsybl, m) {
     m.def("get_short_circuit_bus_results", &pypowsybl::getShortCircuitBusResults, "gets the bus results of a short-circuit analysis", py::arg("result"), py::arg("with_fortescue_result"));
 
     m.def("create_rao", &pypowsybl::createRao, "Create rao context");
-    m.def("run_rao", ::runRaoWithParameters, py::call_guard<py::gil_scoped_release>(), "Run a rao from buffered inputs",
+    m.def("run_rao", &pypowsybl::runRaoWithParameters, py::call_guard<py::gil_scoped_release>(), "Run a rao from buffered inputs",
         py::arg("network"), py::arg("rao_context"), py::arg("parameters"));
     m.def("set_crac_source", ::setCracSource, py::call_guard<py::gil_scoped_release>(), "Set crac source",
             py::arg("network"), py::arg("rao_context"), py::arg("crac_source"));
@@ -1158,6 +1157,8 @@ PYBIND11_MODULE(_pypowsybl, m) {
     m.def("serialize_rao_parameters", ::saveRaoParametersToBinaryBuffer, "Serialize rao parameters to a buffer", py::arg("rao_parameters"));
     m.def("serialize_rao_results_to_buffer", ::saveRaoResultsToBinaryBuffer, "Run a rao", py::arg("rao_result"), py::arg("crac"));
     m.def("get_rao_result_status", &pypowsybl::getRaoResultStatus, "Get the status of a rao result", py::arg("rao_result"));
+    m.def("run_voltage_monitoring", &pypowsybl::runVoltageMonitoring, "Run voltage monitoring", py::arg("network"), py::arg("rao_context"), py::arg("load_flow_parameters"), py::arg("provider"));
+    m.def("run_angle_monitoring", &pypowsybl::runAngleMonitoring, "Run angle monitoring", py::arg("network"), py::arg("rao_context"), py::arg("load_flow_parameters"), py::arg("provider"));
 
     py::enum_<Grid2opStringValueType>(m, "Grid2opStringValueType")
             .value("VOLTAGE_LEVEL_NAME", Grid2opStringValueType::VOLTAGE_LEVEL_NAME)
@@ -1288,11 +1289,6 @@ void setGlskSource(const pypowsybl::JavaHandle& networkHandle, const pypowsybl::
     pypowsybl::PowsyblCaller::get()->callJava<>(::setGlskBufferedSource,
      networkHandle, raoHandle,
      static_cast<char*>(glskInfo.ptr), glskInfo.size);
-}
-
-void runRaoWithParameters(const pypowsybl::JavaHandle& networkHandle, const pypowsybl::JavaHandle& raoHandle, const pypowsybl::JavaHandle& parametersHandle) {
-    pypowsybl::PowsyblCaller::get()->callJava<>(::runRao,
-     networkHandle, raoHandle, parametersHandle);
 }
 
 py::bytes saveRaoResultsToBinaryBuffer(const pypowsybl::JavaHandle& raoResult, const pypowsybl::JavaHandle& crac) {

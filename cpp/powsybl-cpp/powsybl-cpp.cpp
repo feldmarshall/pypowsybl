@@ -1675,6 +1675,20 @@ JavaHandle getCrac(const JavaHandle& raoContext) {
 JavaHandle getRaoResult(const JavaHandle& raoContext) {
     return pypowsybl::PowsyblCaller::get()->callJava<JavaHandle>(::getRaoResult, raoContext);
 }
+void runRaoWithParameters(const JavaHandle& networkHandle, const JavaHandle& raoHandle, const JavaHandle& parametersHandle) {
+    pypowsybl::PowsyblCaller::get()->callJava<>(::runRao, networkHandle, raoHandle, parametersHandle);
+}
+
+void runVoltageMonitoring(const JavaHandle& networkHandle, const JavaHandle& raoHandle, const LoadFlowParameters& parameters, const std::string& provider) {
+    auto c_loadflow_parameters = parameters.to_c_struct();
+    pypowsybl::PowsyblCaller::get()->callJava<>(::runVoltageMonitoring, networkHandle, raoHandle, c_loadflow_parameters.get(), (char *) provider.data());
+}
+
+void runAngleMonitoring(const JavaHandle& networkHandle, const JavaHandle& raoHandle, const LoadFlowParameters& parameters, const std::string& provider) {
+    auto c_loadflow_parameters = parameters.to_c_struct();
+    pypowsybl::PowsyblCaller::get()->callJava<>(::runAngleMonitoring, networkHandle, raoHandle, c_loadflow_parameters.get(), (char *) provider.data());
+}
+
 
 JavaHandle createDefaultRaoParameters() {
     return pypowsybl::PowsyblCaller::get()->callJava<JavaHandle>(::createDefaultRaoParameters);

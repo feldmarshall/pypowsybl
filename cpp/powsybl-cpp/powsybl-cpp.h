@@ -854,6 +854,9 @@ JavaHandle getCrac(const JavaHandle& raoContext);
 JavaHandle getRaoResult(const JavaHandle& raoContext);
 RaoComputationStatus getRaoResultStatus(const JavaHandle& raoResult);
 JavaHandle createDefaultRaoParameters();
+void runRaoWithParameters(const JavaHandle& networkHandle, const JavaHandle& raoHandle, const JavaHandle& parametersHandle);
+void runVoltageMonitoring(const JavaHandle& networkHandle, const JavaHandle& raoHandle, const LoadFlowParameters& parameters, const std::string& provider);
+void runAngleMonitoring(const JavaHandle& networkHandle, const JavaHandle& raoHandle, const LoadFlowParameters& parameters, const std::string& provider);
 
 JavaHandle createGrid2opBackend(const JavaHandle& networkHandle, bool considerOpenBranchReactiveFlow, int busesPerVoltageLevel, bool connectAllElementsToFirstBus);
 void freeGrid2opBackend(const JavaHandle& backendHandle);
