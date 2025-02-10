@@ -16,6 +16,7 @@ import com.powsybl.loadflow.LoadFlowProvider;
 import com.powsybl.openrao.data.crac.api.Crac;
 import com.powsybl.openrao.data.raoresult.api.RaoResult;
 import com.powsybl.openrao.raoapi.json.JsonRaoParameters;
+import com.powsybl.openrao.raoapi.parameters.ObjectiveFunctionParameters;
 import com.powsybl.openrao.raoapi.parameters.RaoParameters;
 import com.powsybl.python.commons.CTypeUtil;
 import com.powsybl.python.commons.Directives;
@@ -25,8 +26,10 @@ import com.powsybl.python.loadflow.LoadFlowCUtils;
 import org.graalvm.nativeimage.IsolateThread;
 import org.graalvm.nativeimage.ObjectHandle;
 import org.graalvm.nativeimage.ObjectHandles;
+import org.graalvm.nativeimage.UnmanagedMemory;
 import org.graalvm.nativeimage.c.CContext;
 import org.graalvm.nativeimage.c.function.CEntryPoint;
+import org.graalvm.nativeimage.c.struct.SizeOf;
 import org.graalvm.nativeimage.c.type.CCharPointer;
 import org.graalvm.nativeimage.c.type.CTypeConversion;
 
@@ -199,28 +202,40 @@ public final class RaoCFunctions {
         });
     }
 
-    /*@CEntryPoint(name = "getMonitoringResultStatus")
-    public static PyPowsyblApiHeader.RaoMonitoringStatus getMonitoringResultStatus(IsolateThread thread, ObjectHandle raoMonitoringHandle, PyPowsyblApiHeader.ExceptionHandlerPointer exceptionHandlerPtr) {
-        return doCatch(exceptionHandlerPtr, () -> {
-            MonitoringResult result = ObjectHandles.getGlobal().get(raoMonitoringHandle);
-            switch (result.getStatus()) {
-                case SECURE -> {
-                    return PyPowsyblApiHeader.RaoMonitoringStatus.SECURE;
-                }
-                case HIGH_CONSTRAINT -> {
-                    return PyPowsyblApiHeader.RaoMonitoringStatus.HIGH_CONSTRAINT;
-                }
-                case LOW_CONSTRAINT -> {
-                    return PyPowsyblApiHeader.RaoMonitoringStatus.LOW_CONSTRAINT;
-                }
-                case HIGH_AND_LOW_CONSTRAINTS -> {
-                    return PyPowsyblApiHeader.RaoMonitoringStatus.HIGH_AND_LOW_CONSTRAINTS;
-                }
-                case FAILURE -> {
-                    return PyPowsyblApiHeader.RaoMonitoringStatus.MONITORING_FAILURE;
-                }
-                default -> throw new PowsyblException("Unexpected monitoring status : " + result.getStatus());
-            }
-        });
-    }*/
+    public static ObjectiveFunctionParameters createObjectiveFunctionParameters() {
+        return new ObjectiveFunctionParameters();
+    }
+
+    @CEntryPoint(name = "createObjectiveFunctionParameters")
+    public static PyPowsyblApiHeader.ObjectiveFunctionParametersPointer createObjectiveFunctionParameters(IsolateThread thread, PyPowsyblApiHeader.ExceptionHandlerPointer exceptionHandlerPtr) {
+        return doCatch(exceptionHandlerPtr, () -> convertToObjectiveFunctionParametersPointer(createObjectiveFunctionParameters()));
+    }
+
+    @CEntryPoint(name = "freeObjectiveFunctionParameters")
+    public static void freeObjectiveFunctionParameters(IsolateThread thread, PyPowsyblApiHeader.ObjectiveFunctionParametersPointer parametersPointer,
+                                              PyPowsyblApiHeader.ExceptionHandlerPointer exceptionHandlerPtr) {
+        doCatch(exceptionHandlerPtr, () -> UnmanagedMemory.free(parametersPointer));
+    }
+
+    private static PyPowsyblApiHeader.ObjectiveFunctionParametersPointer convertToObjectiveFunctionParametersPointer(ObjectiveFunctionParameters parameters) {
+        PyPowsyblApiHeader.ObjectiveFunctionParametersPointer paramsPtr = UnmanagedMemory.calloc(SizeOf.get(PyPowsyblApiHeader.ObjectiveFunctionParametersPointer.class));
+        paramsPtr.setObjectiveFunctionType(parameters.getType().ordinal());
+        paramsPtr.setForbidCostIncrease(parameters.getForbidCostIncrease());
+        paramsPtr.setCurativeMinObjImprovement(parameters.getCurativeMinObjImprovement());
+        paramsPtr.setPreventiveStopCriterion(parameters.getPreventiveStopCriterion().ordinal());
+        paramsPtr.setCurativeStopCriterion(parameters.getCurativeStopCriterion().ordinal());
+        paramsPtr.setOptimizeCurativeIfPreventiveUnsecure(parameters.getOptimizeCurativeIfPreventiveUnsecure());
+        return paramsPtr;
+    }
+
+    private static ObjectiveFunctionParameters convertToObjectiveFunctionParameters(PyPowsyblApiHeader.ObjectiveFunctionParametersPointer ptr) {
+        ObjectiveFunctionParameters param = createObjectiveFunctionParameters();
+        param.setType(ObjectiveFunctionParameters.ObjectiveFunctionType.values()[ptr.getObjectiveFunctionType()]);
+        param.setForbidCostIncrease(ptr.getForbidCostIncrease());
+        param.setCurativeMinObjImprovement(ptr.getCurativeMinObjImprovement());
+        param.setPreventiveStopCriterion(ObjectiveFunctionParameters.PreventiveStopCriterion.values()[ptr.getPreventiveStopCriterion()]);
+        param.setCurativeStopCriterion(ObjectiveFunctionParameters.CurativeStopCriterion.values()[ptr.getCurativeStopCriterion()]);
+        param.setOptimizeCurativeIfPreventiveUnsecure(ptr.getOptimizeCurativeIfPreventiveUnsecure());
+        return param;
+    }
 }

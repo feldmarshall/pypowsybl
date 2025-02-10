@@ -1431,4 +1431,104 @@ public final class PyPowsyblApiHeader {
         @CEnumLookup
         public static native RaoComputationStatus fromCValue(int value);
     }
+
+    @CStruct("objective_function_parameters")
+    public interface ObjectiveFunctionParametersPointer extends PointerBase {
+
+        @CField("objective_function_type")
+        int getObjectiveFunctionType();
+
+        @CField("objective_function_type")
+        void setObjectiveFunctionType(int type);
+
+        @CField("preventive_stop_criterion")
+        int getPreventiveStopCriterion();
+
+        @CField("preventive_stop_criterion")
+        void setPreventiveStopCriterion(int preventiveStopCriterion);
+
+        @CField("curative_stop_criterion")
+        int getCurativeStopCriterion();
+
+        @CField("curative_stop_criterion")
+        void setCurativeStopCriterion(int curativeStopCriterion);
+
+        @CField("curative_min_obj_improvement")
+        double getCurativeMinObjImprovement();
+
+        @CField("curative_min_obj_improvement")
+        void setCurativeMinObjImprovement(double curativeMinObjImprovement);
+
+        @CField("forbid_cost_increase")
+        boolean getForbidCostIncrease();
+
+        @CField("forbid_cost_increase")
+        void setForbidCostIncrease(boolean forbidCostIncrease);
+
+        @CField("optimize_curative_if_preventive_unsecure")
+        boolean getOptimizeCurativeIfPreventiveUnsecure();
+
+        @CField("optimize_curative_if_preventive_unsecure")
+        void setOptimizeCurativeIfPreventiveUnsecure(boolean optimizeCurativeIfPreventiveUnsecure);
+    }
+
+    /*@CStruct("RangeActionsOptimizationParameters")
+    public interface RangeActionsOptimizationParameters extends PointerBase {
+
+        @CField("max_mip_iterations")
+        int getMaxMipIterations();
+
+        @CField("max_mip_iterations")
+        void setMaxMipIterations(int maxMipIterations);
+
+        @CField("pstPenaltyCost")
+        double getPstPenaltyCost();
+
+        @CField("pstPenaltyCost")
+        void setPstPenaltyCost(double pstPenaltyCost);
+
+        @CField("pstSensitivityThreshold")
+        double getPstSensitivityThreshold();
+
+        @CField("pstSensitivityThreshold")
+        void setPstSensitivityThreshold(double pstSensitivityThreshold);
+
+        @CField("pst_model")
+        int getPstModel();
+
+        @CField("pst_model")
+        void setPstModel(int pstModel);
+
+        @CField("hvdc_penalty_cost")
+        double getHvdcPenaltyCost();
+
+        @CField("hvdc_penalty_cost")
+        void setHvdcPenaltyCost(double hvdcPenaltyCost);
+
+        @CField("hvdc_sensitivity_threshold")
+        double getHvdcSensitivityThreshold();
+
+        @CField("hvdc_sensitivity_threshold")
+        void setHvdcSensitivityThreshold(double hvdcSensitivityThreshold);
+
+        @CField("injection_ra_penalty_cost")
+        double getInjectionRaPenaltyCost();
+
+        @CField("injection_ra_penalty_cost")
+        void setInjectionRaPenaltyCost(double injectionRaPenaltyCost);
+
+        @CField("injection_ra_sensitivity_threshold")
+        double getInjectionRaSensitivityThreshold();
+
+        @CField("injection_ra_sensitivity_threshold")
+        void setInjectionRaSensitivityThreshold(double injectionRaSensitivityThreshold);
+
+        @CField("ra_range_shrinking")
+        int getRaRangeShrinking();
+
+        @CField("ra_range_shrinking")
+        void setRaRangeShrinking(int raRangeShrinking);
+
+        // Missing solver
+    }*/
 }

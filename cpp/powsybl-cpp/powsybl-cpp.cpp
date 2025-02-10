@@ -278,6 +278,31 @@ std::shared_ptr<loadflow_parameters> LoadFlowParameters::to_c_struct() const {
     });
 }
 
+ObjectiveFunctionParameters::ObjectiveFunctionParameters(objective_function_parameters* src) {
+    objective_function_type = static_cast<ObjectiveFunctionType>(src->objective_function_type);
+    preventive_stop_criterion = static_cast<PreventiveStopCriterion>(src->preventive_stop_criterion);
+    curative_stop_criterion = static_cast<CurativeStopCriterion>(src->curative_stop_criterion);
+    curative_min_obj_improvement = src->curative_min_obj_improvement;
+    forbid_cost_increase = src->forbid_cost_increase;
+    optimize_curative_if_preventive_unsecure = src->optimize_curative_if_preventive_unsecure;
+}
+
+void ObjectiveFunctionParameters::load_to_c_struct(objective_function_parameters& res) const {
+    res.objective_function_type = objective_function_type;
+    res.preventive_stop_criterion = preventive_stop_criterion;
+    res.curative_stop_criterion = curative_stop_criterion;
+    res.curative_min_obj_improvement = curative_min_obj_improvement;
+    res.forbid_cost_increase = forbid_cost_increase;
+    res.optimize_curative_if_preventive_unsecure = optimize_curative_if_preventive_unsecure;
+}
+
+std::shared_ptr<objective_function_parameters> ObjectiveFunctionParameters::to_c_struct() const {
+    objective_function_parameters* res = new objective_function_parameters();
+    load_to_c_struct(*res);
+    return std::shared_ptr<objective_function_parameters>(res, [](objective_function_parameters* ptr){
+    });
+}
+
 void deleteLoadFlowValidationParameters(loadflow_validation_parameters* ptr) {
     deleteLoadFlowParameters(&ptr->loadflow_parameters);
 }
@@ -636,6 +661,15 @@ LoadFlowParameters* createLoadFlowParameters() {
        PowsyblCaller::get()->callJava(::freeLoadFlowParameters, ptr);
     });
     return new LoadFlowParameters(parameters.get());
+}
+
+ObjectiveFunctionParameters* createObjectiveFunctionParameters() {
+    objective_function_parameters* parameters_ptr = PowsyblCaller::get()->callJava<objective_function_parameters*>(::createObjectiveFunctionParameters);
+    auto parameters = std::shared_ptr<objective_function_parameters>(parameters_ptr, [](objective_function_parameters* ptr){
+        //Memory has been allocated on java side, we need to clean it up on java side
+        PowsyblCaller::get()->callJava(::freeObjectiveFunctionParameters, ptr);
+    });
+    return new ObjectiveFunctionParameters(parameters.get());
 }
 
 LoadFlowValidationParameters* createValidationConfig() {

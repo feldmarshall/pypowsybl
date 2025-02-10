@@ -526,3 +526,12 @@ typedef enum {
     UPDATE_BRANCH_BUS1,
     UPDATE_BRANCH_BUS2,
 } Grid2opUpdateIntegerValueType;
+
+typedef struct objective_function_parameters_struct {
+  int objective_function_type;
+  int preventive_stop_criterion;
+  int curative_stop_criterion;
+  double curative_min_obj_improvement;
+  bool forbid_cost_increase;
+  bool optimize_curative_if_preventive_unsecure;
+} objective_function_parameters;

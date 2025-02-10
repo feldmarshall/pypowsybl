@@ -469,6 +469,42 @@ public:
     std::vector<std::string> provider_parameters_values;
 };
 
+// RAO
+enum PreventiveStopCriterion {
+    P_MIN_OBJECTIVE = 0,
+    P_SECURE,
+};
+
+enum CurativeStopCriterion {
+    C_MIN_OBJECTIVE = 0,
+    C_SECURE,
+    C_PREVENTIVE_OBJECTIVE,
+    C_PREVENTIVE_OBJECTIVE_AND_SECURE,
+};
+
+enum ObjectiveFunctionType {
+    MAX_MIN_MARGIN_IN_MEGAWATT = 0,
+    MAX_MIN_MARGIN_IN_AMPERE,
+    MAX_MIN_RELATIVE_MARGIN_IN_MEGAWATT,
+    MAX_MIN_RELATIVE_MARGIN_IN_AMPERE,
+    MIN_COST_IN_MEGAWATT,
+    MIN_COST_IN_AMPERE,
+};
+
+class ObjectiveFunctionParameters {
+public:
+    ObjectiveFunctionParameters(objective_function_parameters* src);
+    std::shared_ptr<objective_function_parameters> to_c_struct() const;
+    void load_to_c_struct(objective_function_parameters& params) const;
+
+    ObjectiveFunctionType objective_function_type;
+    PreventiveStopCriterion preventive_stop_criterion;
+    CurativeStopCriterion curative_stop_criterion;
+    double curative_min_obj_improvement;
+    bool forbid_cost_increase;
+    bool optimize_curative_if_preventive_unsecure;
+};
+
 char* copyStringToCharPtr(const std::string& str);
 char** copyVectorStringToCharPtrPtr(const std::vector<std::string>& strings);
 int* copyVectorInt(const std::vector<int>& ints);
@@ -857,6 +893,7 @@ JavaHandle createDefaultRaoParameters();
 void runRaoWithParameters(const JavaHandle& networkHandle, const JavaHandle& raoHandle, const JavaHandle& parametersHandle);
 void runVoltageMonitoring(const JavaHandle& networkHandle, const JavaHandle& raoHandle, const LoadFlowParameters& parameters, const std::string& provider);
 void runAngleMonitoring(const JavaHandle& networkHandle, const JavaHandle& raoHandle, const LoadFlowParameters& parameters, const std::string& provider);
+ObjectiveFunctionParameters* createObjectiveFunctionParameters();
 
 JavaHandle createGrid2opBackend(const JavaHandle& networkHandle, bool considerOpenBranchReactiveFlow, int busesPerVoltageLevel, bool connectAllElementsToFirstBus);
 void freeGrid2opBackend(const JavaHandle& backendHandle);

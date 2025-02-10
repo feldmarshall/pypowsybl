@@ -763,6 +763,33 @@ PYBIND11_MODULE(_pypowsybl, m) {
             .value("DEFAULT", RaoComputationStatus::DEFAULT)
             .value("FAILURE", RaoComputationStatus::FAILURE);
 
+    py::enum_<pypowsybl::PreventiveStopCriterion>(m, "PreventiveStopCriterion", "")
+            .value("MIN_OBJECTIVE", pypowsybl::PreventiveStopCriterion::P_MIN_OBJECTIVE, "")
+            .value("SECURE", pypowsybl::PreventiveStopCriterion::P_SECURE, "");
+
+    py::enum_<pypowsybl::CurativeStopCriterion>(m, "CurativeStopCriterion", "")
+            .value("MIN_OBJECTIVE", pypowsybl::CurativeStopCriterion::C_MIN_OBJECTIVE, "")
+            .value("SECURE", pypowsybl::CurativeStopCriterion::C_SECURE, "")
+            .value("PREVENTIVE_OBJECTIVE", pypowsybl::CurativeStopCriterion::C_PREVENTIVE_OBJECTIVE, "")
+            .value("PREVENTIVE_OBJECTIVE_AND_SECURE", pypowsybl::CurativeStopCriterion::C_PREVENTIVE_OBJECTIVE_AND_SECURE, "");
+
+    py::enum_<pypowsybl::ObjectiveFunctionType>(m, "ObjectiveFunctionType", "")
+            .value("MAX_MIN_MARGIN_IN_MEGAWATT", pypowsybl::ObjectiveFunctionType::MAX_MIN_MARGIN_IN_MEGAWATT, "")
+            .value("MAX_MIN_MARGIN_IN_AMPERE", pypowsybl::ObjectiveFunctionType::MAX_MIN_MARGIN_IN_AMPERE, "")
+            .value("MAX_MIN_RELATIVE_MARGIN_IN_MEGAWATT", pypowsybl::ObjectiveFunctionType::MAX_MIN_RELATIVE_MARGIN_IN_MEGAWATT, "")
+            .value("MAX_MIN_RELATIVE_MARGIN_IN_AMPERE", pypowsybl::ObjectiveFunctionType::MAX_MIN_RELATIVE_MARGIN_IN_AMPERE, "")
+            .value("MIN_COST_IN_MEGAWATT", pypowsybl::ObjectiveFunctionType::MIN_COST_IN_MEGAWATT, "")
+            .value("MIN_COST_IN_AMPERE", pypowsybl::ObjectiveFunctionType::MIN_COST_IN_AMPERE, "");
+
+    py::class_<pypowsybl::ObjectiveFunctionParameters>(m, "ObjectiveFunctionParameters")
+            .def(py::init(&pypowsybl::createObjectiveFunctionParameters))
+            .def_readwrite("objective_function_type", &pypowsybl::ObjectiveFunctionParameters::objective_function_type)
+            .def_readwrite("preventive_stop_criterion", &pypowsybl::ObjectiveFunctionParameters::preventive_stop_criterion)
+            .def_readwrite("curative_stop_criterion", &pypowsybl::ObjectiveFunctionParameters::curative_stop_criterion)
+            .def_readwrite("curative_min_obj_improvement", &pypowsybl::ObjectiveFunctionParameters::curative_min_obj_improvement)
+            .def_readwrite("forbid_cost_increase", &pypowsybl::ObjectiveFunctionParameters::forbid_cost_increase)
+            .def_readwrite("optimize_curative_if_preventive_unsecure", &pypowsybl::ObjectiveFunctionParameters::optimize_curative_if_preventive_unsecure);
+
     py::class_<network_metadata, std::shared_ptr<network_metadata>>(m, "NetworkMetadata")
             .def_property_readonly("id", [](const network_metadata& att) {
                 return att.id;
