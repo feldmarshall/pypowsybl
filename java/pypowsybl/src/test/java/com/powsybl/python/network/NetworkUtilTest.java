@@ -9,11 +9,9 @@ package com.powsybl.python.network;
 
 import com.powsybl.iidm.network.*;
 import com.powsybl.iidm.network.test.EurostagTutorialExample1Factory;
-import com.powsybl.openrao.data.crac.api.Crac;
 import com.powsybl.python.commons.PyPowsyblApiHeader;
 import org.junit.jupiter.api.Test;
 
-import java.io.*;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
