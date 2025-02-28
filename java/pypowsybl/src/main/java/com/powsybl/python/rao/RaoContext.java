@@ -40,8 +40,8 @@ public class RaoContext {
         this.crac = crac;
     }
 
-    public void setGlsks(GlskDocument gklss) {
-        this.glsks = glsks;
+    public void setGlsks(GlskDocument glskDocument) {
+        this.glsks = glskDocument;
     }
 
     public void run(Network network, RaoParameters parameters) {

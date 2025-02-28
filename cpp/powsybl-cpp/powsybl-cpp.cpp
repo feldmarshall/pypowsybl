@@ -278,28 +278,126 @@ std::shared_ptr<loadflow_parameters> LoadFlowParameters::to_c_struct() const {
     });
 }
 
-ObjectiveFunctionParameters::ObjectiveFunctionParameters(objective_function_parameters* src) {
+RaoParameters::RaoParameters(rao_parameters* src) {
     objective_function_type = static_cast<ObjectiveFunctionType>(src->objective_function_type);
     preventive_stop_criterion = static_cast<PreventiveStopCriterion>(src->preventive_stop_criterion);
     curative_stop_criterion = static_cast<CurativeStopCriterion>(src->curative_stop_criterion);
     curative_min_obj_improvement = src->curative_min_obj_improvement;
     forbid_cost_increase = src->forbid_cost_increase;
     optimize_curative_if_preventive_unsecure = src->optimize_curative_if_preventive_unsecure;
+
+    solver = static_cast<Solver>(src->solver);
+    relative_mip_gap = src->relative_mip_gap;
+    if (src->solver_specific_parameters != nullptr) {
+        solver_specific_parameters = toString(src->solver_specific_parameters);
+    }
+
+    // range action optimization parameters
+    max_mip_iterations = src->max_mip_iterations;
+    pst_penalty_cost = src->pst_penalty_cost;
+    pst_sensitivity_threshold = src->pst_sensitivity_threshold;
+    pst_model = static_cast<PstModel>(src->pst_model);
+    hvdc_penalty_cost = src->hvdc_penalty_cost;
+    hvdc_sensitivity_threshold = src->hvdc_sensitivity_threshold;
+    injection_ra_penalty_cost = src->injection_ra_penalty_cost;
+    injection_ra_sensitivity_threshold = src->injection_ra_sensitivity_threshold;
+    ra_range_shrinking = static_cast<RaRangeShrinking>(src->ra_range_shrinking);
+
+    // topo optimization parameters
+    max_preventive_search_tree_depth = src->max_preventive_search_tree_depth;
+    max_auto_search_tree_depth = src->max_auto_search_tree_depth;
+    max_curative_search_tree_depth = src->max_curative_search_tree_depth;
+    // Missing predefinedCombinations (list of list of string..)
+    relative_min_impact_threshold = src->relative_min_impact_threshold;
+    absolute_min_impact_threshold = src->absolute_min_impact_threshold;
+    skip_actions_far_from_most_limiting_element = src->skip_actions_far_from_most_limiting_element;
+    max_number_of_boundaries_for_skipping_actions = src->max_number_of_boundaries_for_skipping_actions;
+
+    // Multithreading parameters
+    contingency_scenarios_in_parallel = src->contingency_scenarios_in_parallel;
+    preventive_leaves_in_parallel = src->preventive_leaves_in_parallel;
+    auto_leaves_in_parallel = src->auto_leaves_in_parallel;
+    curative_leaves_in_parallel = src->curative_leaves_in_parallel;
+
+    // Second preventive rao parameters
+    execution_condition = static_cast<ExecutionCondition>(src->execution_condition);
+    re_optimize_curative_range_actions = src->re_optimize_curative_range_actions;
+    hint_from_first_preventive_rao = src->hint_from_first_preventive_rao;
+
+    // Not optimized cnec parameters
+    do_not_optimize_curative_cnecs_for_tsos_without_cras = src->do_not_optimize_curative_cnecs_for_tsos_without_cras;
+
+    // Load flow and sensitivity parameters
+    load_flow_provider = toString(src->load_flow_provider);
+    sensitivity_provider = toString(src->sensitivity_provider);
+    sensitivity_failure_overcost = src->sensitivity_failure_overcost;
+
+    copyCharPtrPtrToVector(src->provider_parameters_keys, src->provider_parameters_keys_count, provider_parameters_keys);
+    copyCharPtrPtrToVector(src->provider_parameters_values, src->provider_parameters_values_count, provider_parameters_values);
 }
 
-void ObjectiveFunctionParameters::load_to_c_struct(objective_function_parameters& res) const {
+void RaoParameters::load_to_c_struct(rao_parameters& res) const {
     res.objective_function_type = objective_function_type;
     res.preventive_stop_criterion = preventive_stop_criterion;
     res.curative_stop_criterion = curative_stop_criterion;
     res.curative_min_obj_improvement = curative_min_obj_improvement;
     res.forbid_cost_increase = forbid_cost_increase;
     res.optimize_curative_if_preventive_unsecure = optimize_curative_if_preventive_unsecure;
+
+    res.solver = int(solver);
+    res.relative_mip_gap = relative_mip_gap;
+    res.solver_specific_parameters = copyStringToCharPtr(solver_specific_parameters);
+
+    // range action optimization parameters
+    res.max_mip_iterations = max_mip_iterations;
+    res.pst_penalty_cost = pst_penalty_cost;
+    res.pst_sensitivity_threshold = pst_sensitivity_threshold;
+    res.pst_model = int(pst_model);
+    res.hvdc_penalty_cost = hvdc_penalty_cost;
+    res.hvdc_sensitivity_threshold = hvdc_sensitivity_threshold;
+    res.injection_ra_penalty_cost = injection_ra_penalty_cost;
+    res.injection_ra_sensitivity_threshold = injection_ra_sensitivity_threshold;
+    res.ra_range_shrinking = int(ra_range_shrinking);
+
+    // topo optimization parameters
+    res.max_preventive_search_tree_depth = max_preventive_search_tree_depth;
+    res.max_auto_search_tree_depth = max_auto_search_tree_depth;
+    res.max_curative_search_tree_depth = max_curative_search_tree_depth;
+    // Missing predefinedCombinations (list of list of string..)
+    res.relative_min_impact_threshold = relative_min_impact_threshold;
+    res.absolute_min_impact_threshold = absolute_min_impact_threshold;
+    res.skip_actions_far_from_most_limiting_element = skip_actions_far_from_most_limiting_element;
+    res.max_number_of_boundaries_for_skipping_actions = max_number_of_boundaries_for_skipping_actions;
+
+    // Multithreading parameters
+    res.contingency_scenarios_in_parallel = contingency_scenarios_in_parallel;
+    res.preventive_leaves_in_parallel = preventive_leaves_in_parallel;
+    res.auto_leaves_in_parallel = auto_leaves_in_parallel;
+    res.curative_leaves_in_parallel = curative_leaves_in_parallel;
+
+    // Second preventive rao parameters
+    res.execution_condition = int(execution_condition);
+    res.re_optimize_curative_range_actions = re_optimize_curative_range_actions;
+    res.hint_from_first_preventive_rao = hint_from_first_preventive_rao;
+
+    // Not optimized cnec parameters
+    res.do_not_optimize_curative_cnecs_for_tsos_without_cras = do_not_optimize_curative_cnecs_for_tsos_without_cras;
+
+    // Load flow and sensitivity parameters
+    res.load_flow_provider = copyStringToCharPtr(load_flow_provider);
+    res.sensitivity_provider = copyStringToCharPtr(sensitivity_provider);
+    res.sensitivity_failure_overcost = sensitivity_failure_overcost;
+
+    res.provider_parameters_keys = pypowsybl::copyVectorStringToCharPtrPtr(provider_parameters_keys);
+    res.provider_parameters_keys_count = provider_parameters_keys.size();
+    res.provider_parameters_values = pypowsybl::copyVectorStringToCharPtrPtr(provider_parameters_values);
+    res.provider_parameters_values_count = provider_parameters_values.size();
 }
 
-std::shared_ptr<objective_function_parameters> ObjectiveFunctionParameters::to_c_struct() const {
-    objective_function_parameters* res = new objective_function_parameters();
+std::shared_ptr<rao_parameters> RaoParameters::to_c_struct() const {
+    rao_parameters* res = new rao_parameters();
     load_to_c_struct(*res);
-    return std::shared_ptr<objective_function_parameters>(res, [](objective_function_parameters* ptr){
+    return std::shared_ptr<rao_parameters>(res, [](rao_parameters* ptr){
     });
 }
 
@@ -663,13 +761,13 @@ LoadFlowParameters* createLoadFlowParameters() {
     return new LoadFlowParameters(parameters.get());
 }
 
-ObjectiveFunctionParameters* createObjectiveFunctionParameters() {
-    objective_function_parameters* parameters_ptr = PowsyblCaller::get()->callJava<objective_function_parameters*>(::createObjectiveFunctionParameters);
-    auto parameters = std::shared_ptr<objective_function_parameters>(parameters_ptr, [](objective_function_parameters* ptr){
+RaoParameters* createRaoParameters() {
+    rao_parameters* parameters_ptr = PowsyblCaller::get()->callJava<rao_parameters*>(::createRaoParameters);
+    auto parameters = std::shared_ptr<rao_parameters>(parameters_ptr, [](rao_parameters* ptr){
         //Memory has been allocated on java side, we need to clean it up on java side
-        PowsyblCaller::get()->callJava(::freeObjectiveFunctionParameters, ptr);
+        PowsyblCaller::get()->callJava(::freeRaoParameters, ptr);
     });
-    return new ObjectiveFunctionParameters(parameters.get());
+    return new RaoParameters(parameters.get());
 }
 
 LoadFlowValidationParameters* createValidationConfig() {
@@ -1709,8 +1807,9 @@ JavaHandle getCrac(const JavaHandle& raoContext) {
 JavaHandle getRaoResult(const JavaHandle& raoContext) {
     return pypowsybl::PowsyblCaller::get()->callJava<JavaHandle>(::getRaoResult, raoContext);
 }
-void runRaoWithParameters(const JavaHandle& networkHandle, const JavaHandle& raoHandle, const JavaHandle& parametersHandle) {
-    pypowsybl::PowsyblCaller::get()->callJava<>(::runRao, networkHandle, raoHandle, parametersHandle);
+void runRaoWithParameters(const JavaHandle& networkHandle, const JavaHandle& raoHandle, const RaoParameters& parameters) {
+    auto c_parameters = parameters.to_c_struct();
+    pypowsybl::PowsyblCaller::get()->callJava<>(::runRao, networkHandle, raoHandle, c_parameters.get());
 }
 
 void runVoltageMonitoring(const JavaHandle& networkHandle, const JavaHandle& raoHandle, const LoadFlowParameters& parameters, const std::string& provider) {

@@ -491,19 +491,93 @@ enum ObjectiveFunctionType {
     MIN_COST_IN_AMPERE,
 };
 
-class ObjectiveFunctionParameters {
-public:
-    ObjectiveFunctionParameters(objective_function_parameters* src);
-    std::shared_ptr<objective_function_parameters> to_c_struct() const;
-    void load_to_c_struct(objective_function_parameters& params) const;
+enum Solver {
+    CBC,
+    SCIP,
+    XPRESS
+};
 
+enum PstModel {
+    CONTINUOUS,
+    APPROXIMATED_INTEGERS
+};
+
+enum class RaRangeShrinking {
+    DISABLED,
+    ENABLED,
+    ENABLED_IN_FIRST_PRAO_AND_CRAO
+};
+
+enum class ExecutionCondition {
+    DISABLED,
+    POSSIBLE_CURATIVE_IMPROVEMENT,
+    COST_INCREASE
+};
+
+class RaoParameters {
+public:
+    RaoParameters(rao_parameters* src);
+    std::shared_ptr<rao_parameters> to_c_struct() const;
+    void load_to_c_struct(rao_parameters& params) const;
+
+    // Objective function parameters
     ObjectiveFunctionType objective_function_type;
     PreventiveStopCriterion preventive_stop_criterion;
     CurativeStopCriterion curative_stop_criterion;
     double curative_min_obj_improvement;
     bool forbid_cost_increase;
     bool optimize_curative_if_preventive_unsecure;
+
+    // range action solver
+    Solver solver;
+    double relative_mip_gap;
+    std::string solver_specific_parameters;
+
+    // range action optimization parameters
+    int max_mip_iterations;
+    double pst_penalty_cost;
+    double pst_sensitivity_threshold;
+    PstModel pst_model;
+    double hvdc_penalty_cost;
+    double hvdc_sensitivity_threshold;
+    double injection_ra_penalty_cost;
+    double injection_ra_sensitivity_threshold;
+    RaRangeShrinking ra_range_shrinking;
+
+    // topo optimization parameters
+    int max_preventive_search_tree_depth;
+    int max_auto_search_tree_depth;
+    int max_curative_search_tree_depth;
+    // Missing predefinedCombinations (list of list of string..)
+    double relative_min_impact_threshold;
+    double absolute_min_impact_threshold;
+    bool skip_actions_far_from_most_limiting_element;
+    int max_number_of_boundaries_for_skipping_actions;
+
+    // Multithreading parameters
+    int contingency_scenarios_in_parallel;
+    int preventive_leaves_in_parallel;
+    int auto_leaves_in_parallel;
+    int curative_leaves_in_parallel;
+
+    // Second preventive rao parameters
+    ExecutionCondition execution_condition;
+    bool re_optimize_curative_range_actions;
+    bool hint_from_first_preventive_rao;
+
+    // Not optimized cnec parameters
+    bool do_not_optimize_curative_cnecs_for_tsos_without_cras;
+
+    // Load flow and sensitivity parameters
+    std::string load_flow_provider;
+    std::string sensitivity_provider;
+    double sensitivity_failure_overcost;
+
+    std::vector<std::string> provider_parameters_keys;
+    std::vector<std::string> provider_parameters_values;
 };
+
+RaoParameters* createRaoParameters();
 
 char* copyStringToCharPtr(const std::string& str);
 char** copyVectorStringToCharPtrPtr(const std::vector<std::string>& strings);
@@ -890,10 +964,9 @@ JavaHandle getCrac(const JavaHandle& raoContext);
 JavaHandle getRaoResult(const JavaHandle& raoContext);
 RaoComputationStatus getRaoResultStatus(const JavaHandle& raoResult);
 JavaHandle createDefaultRaoParameters();
-void runRaoWithParameters(const JavaHandle& networkHandle, const JavaHandle& raoHandle, const JavaHandle& parametersHandle);
+void runRaoWithParameters(const JavaHandle& networkHandle, const JavaHandle& raoHandle, const RaoParameters& parameters);
 void runVoltageMonitoring(const JavaHandle& networkHandle, const JavaHandle& raoHandle, const LoadFlowParameters& parameters, const std::string& provider);
 void runAngleMonitoring(const JavaHandle& networkHandle, const JavaHandle& raoHandle, const LoadFlowParameters& parameters, const std::string& provider);
-ObjectiveFunctionParameters* createObjectiveFunctionParameters();
 
 JavaHandle createGrid2opBackend(const JavaHandle& networkHandle, bool considerOpenBranchReactiveFlow, int busesPerVoltageLevel, bool connectAllElementsToFirstBus);
 void freeGrid2opBackend(const JavaHandle& backendHandle);

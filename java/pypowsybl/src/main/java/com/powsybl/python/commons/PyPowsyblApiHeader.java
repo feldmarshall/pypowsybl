@@ -1432,8 +1432,8 @@ public final class PyPowsyblApiHeader {
         public static native RaoComputationStatus fromCValue(int value);
     }
 
-    @CStruct("objective_function_parameters")
-    public interface ObjectiveFunctionParametersPointer extends PointerBase {
+    @CStruct("rao_parameters")
+    public interface RaoParametersPointer extends PointerBase {
 
         @CField("objective_function_type")
         int getObjectiveFunctionType();
@@ -1470,10 +1470,24 @@ public final class PyPowsyblApiHeader {
 
         @CField("optimize_curative_if_preventive_unsecure")
         void setOptimizeCurativeIfPreventiveUnsecure(boolean optimizeCurativeIfPreventiveUnsecure);
-    }
 
-    /*@CStruct("RangeActionsOptimizationParameters")
-    public interface RangeActionsOptimizationParameters extends PointerBase {
+        @CField("solver")
+        int getSolver();
+
+        @CField("solver")
+        void setSolver(int solver);
+
+        @CField("relative_mip_gap")
+        double getRelativeMipGap();
+
+        @CField("relative_mip_gap")
+        void setRelativeMipGap(double relativeMipGap);
+
+        @CField("solver_specific_parameters")
+        CCharPointer getSolverSpecificParameters();
+
+        @CField("solver_specific_parameters")
+        void setSolverSpecificParameters(CCharPointer solverSpecificParameters);
 
         @CField("max_mip_iterations")
         int getMaxMipIterations();
@@ -1481,16 +1495,16 @@ public final class PyPowsyblApiHeader {
         @CField("max_mip_iterations")
         void setMaxMipIterations(int maxMipIterations);
 
-        @CField("pstPenaltyCost")
+        @CField("pst_penalty_cost")
         double getPstPenaltyCost();
 
-        @CField("pstPenaltyCost")
+        @CField("pst_penalty_cost")
         void setPstPenaltyCost(double pstPenaltyCost);
 
-        @CField("pstSensitivityThreshold")
+        @CField("pst_sensitivity_threshold")
         double getPstSensitivityThreshold();
 
-        @CField("pstSensitivityThreshold")
+        @CField("pst_sensitivity_threshold")
         void setPstSensitivityThreshold(double pstSensitivityThreshold);
 
         @CField("pst_model")
@@ -1529,6 +1543,139 @@ public final class PyPowsyblApiHeader {
         @CField("ra_range_shrinking")
         void setRaRangeShrinking(int raRangeShrinking);
 
-        // Missing solver
-    }*/
+        // Topo optimization parameters
+        @CField("max_preventive_search_tree_depth")
+        int getMaxPreventiveSearchTreeDepth();
+
+        @CField("max_preventive_search_tree_depth")
+        void setMaxPreventiveSearchTreeDepth(int depth);
+
+        @CField("max_auto_search_tree_depth")
+        int getMaxAutoSearchTreeDepth();
+
+        @CField("max_auto_search_tree_depth")
+        void setMaxAutoSearchTreeDepth(int depth);
+
+        @CField("max_curative_search_tree_depth")
+        int getMaxCurativeSearchTreeDepth();
+
+        @CField("max_curative_search_tree_depth")
+        void setMaxCurativeSearchTreeDepth(int depth);
+
+        @CField("relative_min_impact_threshold")
+        double getRelativeMinImpactThreshold();
+
+        @CField("relative_min_impact_threshold")
+        void setRelativeMinImpactThreshold(double threshold);
+
+        @CField("absolute_min_impact_threshold")
+        double getAbsoluteMinImpactThreshold();
+
+        @CField("absolute_min_impact_threshold")
+        void setAbsoluteMinImpactThreshold(double threshold);
+
+        @CField("skip_actions_far_from_most_limiting_element")
+        boolean getSkipActionsFarFromMostLimitingElement();
+
+        @CField("skip_actions_far_from_most_limiting_element")
+        void setSkipActionsFarFromMostLimitingElement(boolean skip);
+
+        @CField("max_number_of_boundaries_for_skipping_actions")
+        int getMaxNumberOfBoundariesForSkippingActions();
+
+        @CField("max_number_of_boundaries_for_skipping_actions")
+        void setMaxNumberOfBoundariesForSkippingActions(int boundaries);
+
+        // Multithreading parameters
+        @CField("contingency_scenarios_in_parallel")
+        int getContingencyScenariosInParallel();
+
+        @CField("contingency_scenarios_in_parallel")
+        void setContingencyScenariosInParallel(int contingencyScenariosInParallel);
+
+        @CField("preventive_leaves_in_parallel")
+        int getPreventiveLeavesInParallel();
+
+        @CField("preventive_leaves_in_parallel")
+        void setPreventiveLeavesInParallel(int preventiveLeavesInParallel);
+
+        @CField("auto_leaves_in_parallel")
+        int getAutoLeavesInParallel();
+
+        @CField("auto_leaves_in_parallel")
+        void setAutoLeavesInParallel(int autoLeavesInParallel);
+
+        @CField("curative_leaves_in_parallel")
+        int getCurativeLeavesInParallel();
+
+        @CField("curative_leaves_in_parallel")
+        void setCurativeLeavesInParallel(int curativeLeavesInParallel);
+
+        @CField("execution_condition")
+        int getExecutionCondition();
+
+        @CField("execution_condition")
+        void setExecutionCondition(int executionCondition);
+
+        @CField("re_optimize_curative_range_actions")
+        boolean getReOptimizeCurativeRangeActions();
+
+        @CField("re_optimize_curative_range_actions")
+        void setReOptimizeCurativeRangeActions(boolean reOptimizeCurativeRangeActions);
+
+        @CField("hint_from_first_preventive_rao")
+        boolean getHintFromFirstPreventiveRao();
+
+        @CField("hint_from_first_preventive_rao")
+        void setHintFromFirstPreventiveRao(boolean hintFromFirstPreventiveRao);
+
+        @CField("do_not_optimize_curative_cnecs_for_tsos_without_cras")
+        boolean getDoNotOptimizeCurativeCnecsForTsosWithoutCras();
+
+        @CField("do_not_optimize_curative_cnecs_for_tsos_without_cras")
+        void setDoNotOptimizeCurativeCnecsForTsosWithoutCras(boolean doNotOptimizeCurativeCnecsForTsosWithoutCras);
+
+        @CField("load_flow_provider")
+        CCharPointer getLoadFlowProvider();
+
+        @CField("load_flow_provider")
+        void setLoadFlowProvider(CCharPointer loadFlowProvider);
+
+        @CField("sensitivity_provider")
+        CCharPointer getSensitivityProvider();
+
+        @CField("sensitivity_provider")
+        void setSensitivityProvider(CCharPointer sensitivityProvider);
+
+        @CField("sensitivity_failure_overcost")
+        double getSensitivityFailureOvercost();
+
+        @CField("sensitivity_failure_overcost")
+        void setSensitivityFailureOvercost(double sensitivityFailureOvercost);
+
+        @CField("provider_parameters_keys")
+        void setProviderParametersKeys(CCharPointerPointer providerParametersKeys);
+
+        @CField("provider_parameters_keys")
+        CCharPointerPointer getProviderParametersKeys();
+
+        @CField("provider_parameters_keys_count")
+        int getProviderParametersKeysCount();
+
+        @CField("provider_parameters_keys_count")
+        void setProviderParametersKeysCount(int providerParametersKeysCount);
+
+        @CField("provider_parameters_values")
+        void setProviderParametersValues(CCharPointerPointer providerParametersValues);
+
+        @CField("provider_parameters_values")
+        CCharPointerPointer getProviderParametersValues();
+
+        @CField("provider_parameters_values_count")
+        int getProviderParametersValuesCount();
+
+        @CField("provider_parameters_values_count")
+        void setProviderParametersValuesCount(int providerParametersKeysCount);
+    }
+
 }

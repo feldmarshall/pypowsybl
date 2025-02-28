@@ -45,7 +45,7 @@ class Rao:
         if parameters is None:
             parameters = RaoParameters()
 
-        _pypowsybl.run_rao(network=network._handle, rao_context=self._handle, parameters=parameters._handle)
+        _pypowsybl.run_rao(network=network._handle, rao_context=self._handle, parameters=parameters._to_c_parameters())
         result_handle = _pypowsybl.get_rao_result(self._handle)
         crac_handle = _pypowsybl.get_crac(self._handle)
         return RaoResult(result_handle, crac_handle)

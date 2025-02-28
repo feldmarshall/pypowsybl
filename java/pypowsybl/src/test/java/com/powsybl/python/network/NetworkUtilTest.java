@@ -9,9 +9,11 @@ package com.powsybl.python.network;
 
 import com.powsybl.iidm.network.*;
 import com.powsybl.iidm.network.test.EurostagTutorialExample1Factory;
+import com.powsybl.openrao.data.crac.api.Crac;
 import com.powsybl.python.commons.PyPowsyblApiHeader;
 import org.junit.jupiter.api.Test;
 
+import java.io.*;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -75,5 +77,14 @@ public class NetworkUtilTest {
         vl2.getNodeBreakerView().newInternalConnection().setNode1(0).setNode2(3).add();
 
         return network;
+    }
+
+    @Test
+    void createCrac() throws IOException {
+        Network network = EurostagTutorialExample1Factory.create();
+        File initialFile = new File("D:/crac_1.json");
+        InputStream targetStream = new FileInputStream(initialFile);
+        Crac crac = Crac.read("crac.json", targetStream, network);
+        System.out.println("Crac");
     }
 }
