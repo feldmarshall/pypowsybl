@@ -533,8 +533,8 @@ typedef struct rao_parameters_struct {
   int preventive_stop_criterion;
   int curative_stop_criterion;
   double curative_min_obj_improvement;
-  bool forbid_cost_increase;
-  bool optimize_curative_if_preventive_unsecure;
+  unsigned char forbid_cost_increase;
+  unsigned char optimize_curative_if_preventive_unsecure;
 
   // range action solver
   int solver;
@@ -556,7 +556,7 @@ typedef struct rao_parameters_struct {
   int max_curative_search_tree_depth;
   double relative_min_impact_threshold;
   double absolute_min_impact_threshold;
-  bool skip_actions_far_from_most_limiting_element;
+  unsigned char skip_actions_far_from_most_limiting_element;
   int max_number_of_boundaries_for_skipping_actions;
 
   int contingency_scenarios_in_parallel; // Multithreading parameters
@@ -565,10 +565,10 @@ typedef struct rao_parameters_struct {
   int curative_leaves_in_parallel;
 
   int execution_condition;  // Second preventive rao parameters
-  bool re_optimize_curative_range_actions;
-  bool hint_from_first_preventive_rao;
+  unsigned char re_optimize_curative_range_actions;
+  unsigned char hint_from_first_preventive_rao;
 
-  bool do_not_optimize_curative_cnecs_for_tsos_without_cras; // Not optimized cnec parameters
+  unsigned char do_not_optimize_curative_cnecs_for_tsos_without_cras; // Not optimized cnec parameters
 
   char* load_flow_provider;  // Load flow and sensitivity parameters
   char* sensitivity_provider;

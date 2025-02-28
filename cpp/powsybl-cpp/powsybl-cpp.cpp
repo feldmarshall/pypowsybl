@@ -283,8 +283,8 @@ RaoParameters::RaoParameters(rao_parameters* src) {
     preventive_stop_criterion = static_cast<PreventiveStopCriterion>(src->preventive_stop_criterion);
     curative_stop_criterion = static_cast<CurativeStopCriterion>(src->curative_stop_criterion);
     curative_min_obj_improvement = src->curative_min_obj_improvement;
-    forbid_cost_increase = src->forbid_cost_increase;
-    optimize_curative_if_preventive_unsecure = src->optimize_curative_if_preventive_unsecure;
+    forbid_cost_increase = (bool) src->forbid_cost_increase;
+    optimize_curative_if_preventive_unsecure = (bool) src->optimize_curative_if_preventive_unsecure;
 
     solver = static_cast<Solver>(src->solver);
     relative_mip_gap = src->relative_mip_gap;
@@ -310,7 +310,7 @@ RaoParameters::RaoParameters(rao_parameters* src) {
     // Missing predefinedCombinations (list of list of string..)
     relative_min_impact_threshold = src->relative_min_impact_threshold;
     absolute_min_impact_threshold = src->absolute_min_impact_threshold;
-    skip_actions_far_from_most_limiting_element = src->skip_actions_far_from_most_limiting_element;
+    skip_actions_far_from_most_limiting_element = (bool) src->skip_actions_far_from_most_limiting_element;
     max_number_of_boundaries_for_skipping_actions = src->max_number_of_boundaries_for_skipping_actions;
 
     // Multithreading parameters
@@ -321,11 +321,11 @@ RaoParameters::RaoParameters(rao_parameters* src) {
 
     // Second preventive rao parameters
     execution_condition = static_cast<ExecutionCondition>(src->execution_condition);
-    re_optimize_curative_range_actions = src->re_optimize_curative_range_actions;
-    hint_from_first_preventive_rao = src->hint_from_first_preventive_rao;
+    re_optimize_curative_range_actions = (bool) src->re_optimize_curative_range_actions;
+    hint_from_first_preventive_rao = (bool) src->hint_from_first_preventive_rao;
 
     // Not optimized cnec parameters
-    do_not_optimize_curative_cnecs_for_tsos_without_cras = src->do_not_optimize_curative_cnecs_for_tsos_without_cras;
+    do_not_optimize_curative_cnecs_for_tsos_without_cras = (bool) src->do_not_optimize_curative_cnecs_for_tsos_without_cras;
 
     // Load flow and sensitivity parameters
     load_flow_provider = toString(src->load_flow_provider);
