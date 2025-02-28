@@ -50,12 +50,22 @@ class Rao:
         crac_handle = _pypowsybl.get_crac(self._handle)
         return RaoResult(result_handle, crac_handle)
 
-    def run_voltage_monitoring(self, network: Network, load_flow_parameters: pypowsybl.loadflow.Parameters = None, providerStr: str = '') -> RaoResult:
+    def run_voltage_monitoring(self, network: Network, load_flow_parameters: pypowsybl.loadflow.Parameters = None, provider_str: str = '') -> RaoResult:
         """
         """
         p = load_flow_parameters._to_c_parameters() if load_flow_parameters is not None else _pypowsybl.LoadFlowParameters()
 
-        _pypowsybl.run_voltage_monitoring(network._handle, self._handle, p, providerStr)
+        _pypowsybl.run_voltage_monitoring(network._handle, self._handle, p, provider_str)
+        result_handle = _pypowsybl.get_rao_result(self._handle)
+        crac_handle = _pypowsybl.get_crac(self._handle)
+        return RaoResult(result_handle, crac_handle)
+
+    def run_angle_monitoring(self, network: Network, load_flow_parameters: pypowsybl.loadflow.Parameters = None, provider_str: str = '') -> RaoResult:
+        """
+        """
+        p = load_flow_parameters._to_c_parameters() if load_flow_parameters is not None else _pypowsybl.LoadFlowParameters()
+
+        _pypowsybl.run_angle_monitoring(network._handle, self._handle, p, provider_str)
         result_handle = _pypowsybl.get_rao_result(self._handle)
         crac_handle = _pypowsybl.get_crac(self._handle)
         return RaoResult(result_handle, crac_handle)
