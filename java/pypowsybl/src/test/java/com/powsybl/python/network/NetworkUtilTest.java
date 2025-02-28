@@ -78,13 +78,4 @@ public class NetworkUtilTest {
 
         return network;
     }
-
-    @Test
-    void createCrac() throws IOException {
-        Network network = EurostagTutorialExample1Factory.create();
-        File initialFile = new File("D:/crac_1.json");
-        InputStream targetStream = new FileInputStream(initialFile);
-        Crac crac = Crac.read("crac.json", targetStream, network);
-        System.out.println("Crac");
-    }
 }
